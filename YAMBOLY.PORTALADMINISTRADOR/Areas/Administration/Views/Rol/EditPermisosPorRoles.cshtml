@@ -1,0 +1,70 @@
+﻿@model YAMBOLY.PORTALADMINISTRADOR.VIEWMODEL.Administration.Rol.RolListViewModel
+@{
+    ViewBag.Title = "Maestro de permisos por vista";
+    ViewBag.Icon = "users";
+    ViewBag.Section = String.Empty;
+    ViewBag.Subsection = String.Empty;
+
+}
+
+@section Breadcrumbs{
+    <li><a href="@Url.Action("List", "Rol", new { Areas =ConstantHelper.Area.ADMINISTRATION })"> Lista de roles</a></li>
+}
+
+<h3><i class="fa fa-shield"></i> Vistas</h3>
+
+@using (Html.BeginForm("List", "Rol", FormMethod.Post))
+{
+    @Html.HiddenFor(x => Model.RolId)
+    <div class="panel-group" id="accordion-continuous" aria-multiselectable="true" role="tablist">
+
+        @foreach (var grupo in Model.ViewGroupList)
+        {
+            <div class="panel">
+                <div class="panel-heading" id="heading-continuous-one" role="tab">
+                    <a class="panel-title collapsed" data-parent="#accordion-continuous" data-toggle="collapse" href="#@grupo.ViewGroupCode" aria-controls="@grupo.ViewGroupCode" aria-expanded="false">
+                        <i class="fa fa-cubes" aria-hidden="true"></i>&nbsp; @grupo.ViewGroupName
+                    </a>
+                </div>
+                <div class="panel-collapse collapse" id="@grupo.ViewGroupCode" aria-labelledby="heading-continuous-one" role="tabpanel" aria-expanded="false">
+                    <div class="panel-body">
+                        <div class="table table-responsive">
+                            <table class="table table-hover table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        @foreach (var vista in Model.ViewList.Where(x => x.ViewGroupId == grupo.ViewGroupId))
+                                        {
+                                            <th class="text-center">@vista.ViewName</th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        @foreach (var vista in Model.ViewList.Where(x => x.ViewGroupId == grupo.ViewGroupId))
+                                        {
+                                            var vistaUsuario = Model.RolesViewList.FirstOrDefault(x => x.ViewId == vista.ViewId && x.RolId == Model.RolId && x.RolesViewsState == true);
+                                            var name = "chk-" + vista.ViewCode + "-" + Model.RolId;
+                                            <td class="text-center">
+                                                <div class="checkbox-custom checkbox-primary">
+                                                    <input type="checkbox" id="@name" name="@name" @(vistaUsuario == null ? String.Empty : "checked") />
+                                                    <label for="@name">&nbsp;</label>
+                                                </div>
+                                            </td>
+                                        }
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="text-right">
+        <a class="btn btn-default animsition-link pull-left" href="@Url.Action("List", "Rol", new { area = ConstantHelper.Area.ADMINISTRATION})"><i class="fa fa-arrow-left"></i> Atrás</a>
+        <button type="submit" class="btn btn-primary"><i class="fa fa-floppy-o" aria-hidden="true"></i> Guardar</button>
+    </div>
+
+}

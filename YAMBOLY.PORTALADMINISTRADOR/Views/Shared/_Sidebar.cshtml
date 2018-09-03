@@ -1,0 +1,78 @@
+﻿<div>
+    <br />
+    @{
+        var homeController = new YAMBOLY.PORTALADMINISTRADOR.Areas.Administration.Controllers.UserController();
+    }
+    <ul class="site-menu">
+        @*<li class="site-menu-item has-sub">
+            <a href="~">
+                <i class="site-menu-icon wb-map" aria-hidden="true"></i>
+                <span class="site-menu-title">Test menu</span>
+            </a>
+        </li>*@
+        <li class="site-menu-item has-sub title_">
+            <a href="javascript:void(0)">
+                <i class="site-menu-icon wb-dashboard" aria-hidden="true"></i>
+                <span class="site-menu-title">Administración</span>
+            </a>
+            <ul class="site-menu-sub">
+                @if (Session.GetRol() == AppRol.SUPERADMINISTRATOR)
+                {
+                    <li class="site-menu-item">
+                        <a class="animsition-link" href="@Url.Action("List", "Rol", new { Area = ConstantHelper.Area.ADMINISTRATION})"
+                           data-animsition-out-class="rotate-out"
+                           data-animsition-out-duration="500">
+                            <span class="site-menu-title">Permisos por Rol</span>
+                        </a>
+                    </li>
+                }
+
+                @if (Session.GetViewPermissions().Intersect(new String[] { ConstantHelper.Views.Administration.User.LIST }).Count() > 0)
+                {
+                    <li class="site-menu-item">
+                        <a class="animsition-link" href="@Url.Action("List", "User", new { Area = ConstantHelper.Area.ADMINISTRATION})">
+                            <span class="site-menu-title">Usuarios</span>
+                        </a>
+                    </li>
+                }
+
+                @*@if (Session.GetViewPermissions().Intersect(new String[] { ConstantHelper.Views.Administration.User.LIST }).Count() > 0)
+                {
+                    <li class="site-menu-item">
+                        <a class="animsition-link" href="@Url.Action("List", "User", new { Area = ConstantHelper.Area.ADMINISTRATION})">
+                            <span class="site-menu-title">Usuarios</span>
+                        </a>
+                    </li>
+                }*@
+            </ul>
+        </li>
+        <li class="site-menu-item has-sub title_">
+            <a href="javascript:void(0)">
+                <i class="site-menu-icon wb-dashboard" aria-hidden="true"></i>
+                <span class="site-menu-title">Geolocalización</span>
+            </a>
+            <ul class="site-menu-sub">
+                @if (Session.GetViewPermissions().Intersect(new String[] { ConstantHelper.Views.GeoLocation.Map.VIEW }).Count() > 0)
+                {
+                    <li class="site-menu-item">
+                        <a class="animsition-link" href="@Url.Action("Index", "Map", new { Area = ConstantHelper.Area.GEOLOCATION})">
+                            <span class="site-menu-title">Zonas y rutas</span>
+                        </a>
+                    </li>
+                }
+                @*@if (Session.GetViewPermissions().Intersect(new String[] { ConstantHelper.Views.Administration.User.LIST }).Count() > 0)
+                {
+                    <li class="site-menu-item">
+                        <a class="animsition-link" href="@Url.Action("List", "User", new { Area = ConstantHelper.Area.ADMINISTRATION})">
+                            <span class="site-menu-title">Usuarios</span>
+                        </a>
+                    </li>
+                }*@
+            </ul>
+        </li>
+    </ul>
+</div>
+
+<script>
+
+</script>

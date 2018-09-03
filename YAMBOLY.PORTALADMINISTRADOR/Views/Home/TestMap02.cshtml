@@ -1,0 +1,42 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+<div>
+    <div id="map" style="width: 500px; height: 400px;"></div>
+</div>
+
+@section Scripts{
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0hFla3KhpSUtpkjK7gqJVqfqUCI-7oFs&sensor=false&libraries=drawing"></script>
+
+    <script>
+        initMap();
+        function initMap() {
+            var map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: -34.397, lng: 150.644 },
+                zoom: 8
+            });
+
+            var drawingManager = new google.maps.drawing.DrawingManager({
+                drawingMode: google.maps.drawing.OverlayType.MARKER,
+                drawingControl: true,
+                drawingControlOptions: {
+                    position: google.maps.ControlPosition.TOP_CENTER,
+                    //drawingModes: ['marker', 'circle', 'polygon', 'polyline', 'rectangle']
+                    drawingModes: ['polygon']
+                },
+                markerOptions: { icon: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png' },
+                polygonOptions: {
+                    fillColor: '#ffff00',
+                    fillOpacity: 10,
+                    strokeWeight: 3,
+                    clickable: true,
+                    editable: true,
+                    zIndex: 1
+                }
+                
+            });
+            drawingManager.setMap(map);
+        }
+
+    </script>
+}

@@ -1,0 +1,109 @@
+﻿@{
+    ViewBag.GUID = ViewBag.GUID ?? Guid.NewGuid().ToString();
+}
+@RenderSection("Styles", false)
+<div id="@ViewBag.GUID">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+        <h4 class="modal-title"><i class="fa fa-@ViewBag.Icon contrast">&nbsp;</i> @ViewBag.Title </h4>
+    </div>
+
+    @*@if (TempData["FlashMessage"] != null)
+        {
+            @Html.AlertDark((MessageType)TempData["MessageType"], TempData["FlashMessage"].ToSafeString())
+        }*@
+    @if (ViewBag.Form != null)
+    {
+        Html.BeginForm();
+    }
+    <div class="modal-body" style="overflow:hidden;">
+        @RenderBody()
+    </div>
+
+    <div class="modal-footer">
+        @if (ViewBag.DeshabilitarCerrarFooter == null || !ViewBag.DeshabilitarCerrarFooter)
+        {
+            <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Cerrar</button>
+        }
+        @if (ViewBag.Form != null)
+        {
+            <button type="submit" class="btn btn-primary" ><i class="fa fa-check"></i> Aceptar</button>
+        }
+        @RenderSection("ModalFooter", false)
+    </div>
+    @if (ViewBag.Form != null)
+    {
+        Html.EndForm();
+    }
+</div>
+
+
+
+@if (ViewBag.Response == null)
+{
+    <script>
+        var urlModalRedirect = '';
+        $(function () {
+            $('#@ViewBag.GUID form').submit(function (e) {
+                debugger;
+                var $form = $(this);
+                e.preventDefault();
+                var model = $form.serialize();
+                var url = $form.attr('action');
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: model,
+                    success: function (value) {
+                        $form.closest('.modal').modal('hide');
+                        if (urlModalRedirect != '') {
+                            window.location.href = urlModalRedirect;
+                        }
+                        return true;
+                    },
+                    error: function (error) {
+                        return false;
+                    },
+                    complete: function (value) {
+                        if (urlModalRedirect != '') {
+                            window.location.href = urlModalRedirect;
+                        }
+                        return true;
+                    },
+                });
+            });
+            console.log('modal');
+
+            $('*[data-plugin="select2"]').select2({
+
+                language: 'es',
+                placeholder: "[ -- Seleccione -- ]",
+                allowClear: true
+            });
+
+            $('*[data-plugin="select2"]').next('.select2').find('.select2-selection').one('focus', select2Focus).on('blur', function () {
+                $(this).one('focus', select2Focus)
+            })
+        });
+
+        $(".modal").on('hidden.bs.modal', function () {
+            $(this).remove();
+            $('.pac-container').remove();
+            $('iframe[name=gm-master]').remove();
+            console.log('modal close');
+            //-------------------------
+            //funciones de despacho
+            ReservaId = "";
+            seleccionaId();
+            codigoMovilBusqueda();
+            getReservaBusqueda();
+            //debugger;
+            clearInterval(interMapa);
+            clearInterval(interRutas);
+            //-------------------------
+        });
+
+
+    </script>
+}
+@RenderSection("Scripts", false)

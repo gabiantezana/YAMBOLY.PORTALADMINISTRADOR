@@ -1,0 +1,49 @@
+﻿@model IPagedList<YAMBOLY.PORTALADMINISTRADOR.MODEL.Users>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <td>Id</td>
+            <td>UserName</td>
+            <td>Rol</td>
+            <td>Nombres</td>
+            <td>Documento</td>
+            <td>Estado</td>
+            <td class="text-center">Opciones</td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>@item.UserId</td>
+            <td>@item.UserName</td>
+            <td>@(item.Roles?.RolName)</td>
+            <td>@item.Nombres</td>
+            <td>@item.Documento</td>
+            <td>@( item.isActive == true ? ConstantHelper.ESTADO_ACTIVO : ConstantHelper.ESTADO_INACTIVO)</td>
+            <td class="text-nowrap text-center">
+                <a href="@Url.Action("AddUpdate", "User", new { Area = "Administration", id = item.UserId})" class="btn btn-sm btn-icon btn-flat btn-default" data-toggle="tooltip" data-original-title="Editar">
+                    <i class="icon wb-wrench" aria-hidden="true"></i>
+                </a>
+                <a href="@Url.Action("ChangeState", "User", new { Area = "Administration", userId = item.UserId})" class="btn btn-sm btn-icon btn-flat btn-default"
+                   data-toggle="tooltip" data-original-title="@(item.isActive == true? "Desactivar":"Activar")">
+                    @if (item.isActive == true)
+                    {
+                        <i class="fa fa-toggle-on" aria-hidden="true"></i>
+                    }
+                    else
+                    {
+                        <i class="fa fa-toggle-off" aria-hidden="true"></i>
+                    }
+
+                </a>
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+<div id="myPager">
+    @Html.PagedListPager(Model, page => Url.Action("_LstClientesPaged", new { p = page }), PagedListRenderOptions.EnableUnobtrusiveAjaxReplacing("lstClientes"))
+</div>

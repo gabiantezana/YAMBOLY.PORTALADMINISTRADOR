@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="16ffee2f2bd947b38d978b02012de25f" Name="Diagram1">
+        <EntityTypeShape EntityType="YAMBOLY_PORTALADMINISTRADORModel.ErrorLog" Width="1.5" PointX="0.75" PointY="6.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="YAMBOLY_PORTALADMINISTRADORModel.Roles" Width="1.5" PointX="3" PointY="4" IsExpanded="true" />
+        <EntityTypeShape EntityType="YAMBOLY_PORTALADMINISTRADORModel.RolesViews" Width="1.5" PointX="5.25" PointY="0.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="YAMBOLY_PORTALADMINISTRADORModel.Users" Width="1.5" PointX="5.25" PointY="3.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="YAMBOLY_PORTALADMINISTRADORModel.ViewGroup" Width="1.5" PointX="0.75" PointY="1.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="YAMBOLY_PORTALADMINISTRADORModel.Views" Width="1.5" PointX="3" PointY="0.875" IsExpanded="true" />
+        <AssociationConnector Association="YAMBOLY_PORTALADMINISTRADORModel.FK__RolesView__RolId__24927208" ManuallyRouted="false" />
+        <AssociationConnector Association="YAMBOLY_PORTALADMINISTRADORModel.FK__Users__RolId__1CF15040" ManuallyRouted="false" />
+        <AssociationConnector Association="YAMBOLY_PORTALADMINISTRADORModel.FK__RolesView__ViewI__25869641" ManuallyRouted="false" />
+        <AssociationConnector Association="YAMBOLY_PORTALADMINISTRADORModel.FK__Views__ViewGroup__21B6055D" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

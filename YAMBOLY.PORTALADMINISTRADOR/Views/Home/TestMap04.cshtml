@@ -1,0 +1,98 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+<div>
+    <input type="button" value="Crear zona" onclick="OnCreateClick(drawingModes.drawZoneMode)" />
+    <input type="button" value="Crear ruta" onclick="OnCreateClick(drawingModes.drawRouteMode)" />
+    <input type="button" id="RemoveSelectedPolygon" value="Eliminar" style="display: none;" onclick="RemoveSelectedPolygon(this)" />
+    <div id="showonPolygon"><b> Area:</b> <span id="areaPolygon">&nbsp700;</span></div>
+    <div id="map" style="width:1200px ; height: 400px;"></div>
+</div>
+
+@section Scripts{
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0hFla3KhpSUtpkjK7gqJVqfqUCI-7oFs&sensor=false&libraries=drawing"></script>
+    <script src="~/Scripts/Views/Home/TestMap04.js"></script>
+    <script src="~/Scripts/underscore.js"></script>
+    <script>
+
+        var polygonArray = [];
+        var editedPolygonArray = [];
+        var current = null
+        var drawingMode = null;
+        var map;
+        var all_overlays = [];
+        var drawingManager;
+        var selectedShape;
+
+        initialize();
+
+        function initialize() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: latLngCenterInit,
+                zoom: 13,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            });
+
+            drawingManager = new google.maps.drawing.DrawingManager({
+                drawingMode: google.maps.drawing.OverlayType.POLYGON,
+                drawingControl: false,
+                markerOptions: {
+                    draggable: true
+                },
+            });
+
+            google.maps.event.addListener(drawingManager, 'polygoncomplete', function (polygon) {
+                debugger;
+                if (drawingMode == drawingModes.drawRouteMode) {
+                    var zone = GetZonePolygoneFromRoutePolygon(polygon);
+                    if (zone == null) {
+                        alert("Hubo un error al obtener la zona de la ruta seleccionada");
+                        RemoveSelectedPolygon();
+                        return;
+                    }
+                    if (!isPolygonInsidePolygon(polygon, zone)) {
+                        alert("La ruta debe estar dentro la zona");
+                        RemoveSelectedPolygon();
+                        return;
+                    }
+
+                    //Change color for next draw in routes
+                    var polygonOptions = drawingManager.get('polygonOptions');
+                    polygonOptions.fillColor = colors[Math.floor(Math.random() * colors.length)];
+                    drawingManager.set('polygonOptions', polygonOptions);
+                }
+
+                current = polygon;
+
+                editedPolygonArray.push({ current });
+            });
+
+            google.maps.event.addListener(drawingManager, 'overlaycomplete', function (e) {
+                all_overlays.push(e);
+                if (e.type != google.maps.drawing.OverlayType.MARKER) {
+                    // Switch back to non-drawing mode after drawing a shape.
+                    drawingManager.setDrawingMode(null);
+
+                    // Add an event listener that selects the newly-drawn shape when the user mouses down on it.
+                    var newShape = e.overlay;
+                    newShape.type = e.type;
+                    google.maps.event.addListener(newShape, 'click', function () {
+                        setSelection(newShape);
+                    });
+                    setSelection(newShape);
+                }
+            });
+
+            google.maps.event.addListener(drawingManager, 'drawingmode_changed', clearSelection);
+
+            google.maps.event.addListener(map, 'click', clearSelection);
+        }
+
+
+
+//google.maps.event.addDomListener(window, "load", initialize);
+// Clear the current selection when the drawing mode is changed, or when the
+// map is clicked.
+
+    </script>
+}

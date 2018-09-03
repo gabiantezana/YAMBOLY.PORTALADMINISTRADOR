@@ -1,0 +1,1082 @@
+﻿@model YAMBOLY.PORTALADMINISTRADOR.VIEWMODEL.GeoLocation.MapViewModel
+@{
+    ViewBag.Title = "Gestión de zonas y rutas";
+    ViewBag.Icon = "users";
+    ViewBag.Section = String.Empty;
+    ViewBag.Subsection = String.Empty;
+}
+
+@*@section Breadcrumbs{
+
+    }*@
+
+
+
+@*<div class="panel-footer text-right">
+        <button class="btn btn-primary" id="btnGuardar"><i class="fa fa-save" aria-hidden="true"></i>&nbsp; Guardar</button>
+    </div>*@
+@using (Html.BeginForm("Index", "Map", FormMethod.Post, new { id = "mapForm" }))
+{
+    <div class="col-sm-4">
+        <div class="panel">
+            @Html.HiddenFor(x => x.PostedShapeList)
+            @Html.HiddenFor(x => x.VisibleMarkers)
+            @Html.HiddenFor(x => x.ReportType)
+
+            <div class="panel-body">
+                <div class="nav-tabs-horizontal nav-tabs-inverse nav-tabs-animate">
+                    <ul class="nav nav-tabs" data-plugin="nav-tabs" role="tablist">
+                        <li class="active" role="presentation" onclick="OnTabClick(1)"><a data-toggle="tab" href="#tab1" aria-controls="tab1" role="tab">Zonas</a></li>
+                        <li role="presentation" onclick="OnTabClick(2)"><a data-toggle="tab" href="#tab2" aria-controls="tab2" role="tab">Búsqueda y reportes</a></li>
+                    </ul>
+                </div>
+                <div class="tab-content">
+                    <div class="tab-pane  animation-scale-up active" id="tab1" role="tabpanel">
+                        <div class="panel-body">
+                            <div class="row">
+                                <label for="input-search" class="sr-only">Search Tree:</label>
+                                <input type="input" class="form-control" id="input-search" placeholder="Buscar..." value="">
+                            </div>
+                            <div class="fixed-panel">
+                                <div id="tree" class="treeview"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane  animation-scale-up" id="tab2" role="tabpanel">
+                        <div class="panel-body">
+                            <div class="fixed-panel">
+                                <div class="row">
+                                    @Html.LabelFor(x => Model.Region, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.DropDownListFor(x => Model.Region, new SelectList(Model.RegionJList, "id", "text"), new { @class = "form-control form-group-margin", @data_plugin = "select2", @data_isedit = "false" })
+                                        @Html.ValidationMessageFor(x => x.Region)
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    @Html.LabelFor(x => Model.Departamento, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.DropDownListFor(x => Model.Departamento, new SelectList(Model.DepartamentoJList, "id", "text"),
+                                        new
+                                        {
+                                            @class = "form-control form-group-margin",
+                                            @data_plugin = "select2",
+                                            @onchange = "OnChangeSelect2(this)",
+                                            @data_select = "select",
+                                            @data_url = @Url.Action("GetProvinciaJList", "Map"),
+                                            @data_target = "Provincia",
+                                            @data_isEdit = "false",
+                                        })
+                                        @Html.ValidationMessageFor(x => x.Departamento)
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    @Html.LabelFor(x => Model.Provincia, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.DropDownListFor(x => Model.Provincia, new SelectList(Model.ProvinciaJList, "id", "text")
+                                        , new
+                                        {
+                                            @class = "form-control form-group-margin",
+                                            @data_plugin = "select2",
+                                            @onchange = "OnChangeSelect2(this)",
+                                            @data_select = "select",
+                                            @data_url = @Url.Action("GetDistritoJList", "Map"),
+                                            @data_target = "Distrito",
+                                            @data_isedit = "false"
+                                        })
+                                        @Html.ValidationMessageFor(x => Model.Provincia)
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    @Html.LabelFor(x => Model.Distrito, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.DropDownListFor(x => Model.Distrito, new SelectList(Model.DistritoJList, "id", "text"), new { @class = "form-control form-group-margin", @data_plugin = "select2", @data_isedit = "false" })
+                                        @Html.ValidationMessageFor(x => x.Distrito)
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    @Html.LabelFor(x => Model.Zona, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.DropDownListFor(x => Model.Zona, new SelectList(Model.ZonaJList, "id", "text")
+, new
+{
+    @class = "form-control form-group-margin",
+    @data_plugin = "select2",
+    @onchange = "OnChangeSelect2(this)",
+    @data_select = "select",
+    @data_url = @Url.Action("GetRutaByZoneJList", "Map"),
+    @data_target = "Ruta",
+    @data_isedit = "false"
+})
+                                        @Html.ValidationMessageFor(x => x.Zona)
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    @Html.LabelFor(x => Model.Ruta, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.DropDownListFor(x => Model.Ruta, new SelectList(Model.RutaJList, "id", "text"), new { @class = "form-control input-xs form-group-margin", @data_plugin = "select2", @data_isedit = "false" })
+                                        @Html.ValidationMessageFor(x => x.Ruta)
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    @Html.LabelFor(x => Model.Canal, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.DropDownListFor(x => Model.Canal, new SelectList(Model.CanalJList, "id", "text"), new { @class = "form-control form-group-margin", @data_plugin = "select2", @data_isedit = "false" })
+                                        @Html.ValidationMessageFor(x => x.Canal)
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    @Html.LabelFor(x => Model.Giro, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.DropDownListFor(x => Model.Giro, new SelectList(Model.GiroJList, "id", "text"), new { @class = "form-control form-group-margin", @data_plugin = "select2", @data_isedit = "false" })
+                                        @Html.ValidationMessageFor(x => x.Giro)
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    @Html.LabelFor(x => Model.ConActivos, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-3">
+                                        @Html.CheckBoxFor(x => Model.ConActivos, new { @data_plugin = "switchery" })
+                                    </div>
+                                    <div class="col-sm-6">
+                                        @Html.TextBoxFor(x => Model.CodigoActivo, new { @class = "form-control", @placeholder = "Código" })
+                                        @Html.ValidationMessageFor(x => x.CodigoActivo)
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    @Html.LabelFor(x => Model.TipoCliente, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.DropDownListFor(x => Model.TipoCliente, new SelectList(Model.TipoClienteJList, "id", "text"), new { @class = "form-control form-group-margin", @data_plugin = "select2", @data_isedit = "false" })
+                                        @Html.ValidationMessageFor(x => x.TipoCliente)
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    @Html.LabelFor(x => Model.Vendedor, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.DropDownListFor(x => Model.Vendedor, new SelectList(Model.VendedorJList, "id", "text"), new { @class = "form-control form-group-margin", @data_plugin = "select2", @data_isedit = "false" })
+                                        @Html.ValidationMessageFor(x => x.Vendedor)
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    @Html.LabelFor(x => Model.Supervisor, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.DropDownListFor(x => Model.Supervisor, new SelectList(Model.SupervisorJList, "id", "text"), new { @class = "form-control form-group-margin", @data_plugin = "select2", @data_isedit = "false" })
+                                        @Html.ValidationMessageFor(x => x.Supervisor)
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    @Html.LabelFor(x => Model.JefeVentas, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.DropDownListFor(x => Model.JefeVentas, new SelectList(Model.JefeVentasJList, "id", "text"), new { @class = "form-control form-group-margin", @data_plugin = "select2", @data_isedit = "false" })
+                                        @Html.ValidationMessageFor(x => x.JefeVentas)
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    @Html.Label("Días visita", new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        <div class="form-group">
+                                            <label class="checkbox-inline">@Html.CheckBoxFor(x => x.DiaDeVisitaLunes)L</label>
+                                            <label class="checkbox-inline">@Html.CheckBoxFor(x => x.DiaDeVisitaMartes)M</label>
+                                            <label class="checkbox-inline">@Html.CheckBoxFor(x => x.DiaDeVisitaMiercoles)x</label>
+                                            <label class="checkbox-inline">@Html.CheckBoxFor(x => x.DiaDeVisitaJueves)J</label>
+                                            <label class="checkbox-inline">@Html.CheckBoxFor(x => x.DiaDeVisitaViernes)V</label>
+                                            <label class="checkbox-inline">@Html.CheckBoxFor(x => x.DiaDeVisitaSabado)S</label>
+                                            <label class="checkbox-inline">@Html.CheckBoxFor(x => x.DiaDeVisitaDomingo)D</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    @Html.LabelFor(x => Model.FrecuenciaVisita, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-9">
+                                        @Html.DropDownListFor(x => Model.FrecuenciaVisita, new SelectList(Model.FrecuenciaVisitaJList, "id", "text"), new { @class = "form-control form-group-margin", @data_plugin = "select2", @data_isedit = "false" })
+                                        @Html.ValidationMessageFor(x => x.FrecuenciaVisita)
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    @Html.LabelFor(x => Model.VentasMontoMinimo, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-3">
+                                        @Html.TextBoxFor(x => Model.VentasMontoMinimo, new { @class = "form-control " })
+                                        @Html.ValidationMessageFor(x => x.VentasMontoMinimo)
+                                    </div>
+                                    @Html.LabelFor(x => Model.VentasMontoMaximo, new { @class = "col-sm-2 control-label" })
+                                    <div class="col-sm-4">
+                                        @Html.TextBoxFor(x => Model.VentasMontoMaximo, new { @class = "form-control " })
+                                        @Html.ValidationMessageFor(x => x.VentasMontoMaximo)
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    @Html.LabelFor(x => Model.VentasFechaInicio, new { @class = "col-sm-3 control-label" })
+                                    <div class="col-sm-3">
+                                        <div class="input-group date">
+                                            @Html.TextBoxFor(x => Model.VentasFechaInicio, "{0:dd/MM/yyyy}", new { @class = "form-control fecha", @type = "text" })
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                        @Html.ValidationMessageFor(x => Model.VentasFechaInicio)
+                                    </div>
+                                    @Html.LabelFor(x => Model.VentasFechaFin, new { @class = "col-sm-2 control-label" })
+                                    <div class="col-sm-4">
+                                        <div class="input-group date">
+                                            @Html.TextBoxFor(x => Model.VentasFechaFin, "{0:dd/MM/yyyy}", new { @class = "form-control fecha", @type = "text" })
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                        @Html.ValidationMessageFor(x => Model.VentasFechaFin)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <button class="btn btn-primary" id="btnBuscarCliente" type="button" onclick="SearchClient()"><i class="fa fa-save" aria-hidden="true"></i>&nbsp; Filtrar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!--PANEL MAPA Y BOTONES--><div class="col-sm-8">
+        <div class="panel">
+            <div class="panel-body">
+                @if (Session.GetViewPermissions().Intersect(new String[] { ConstantHelper.Views.GeoLocation.Map.UPDATE }).Count() > 0)
+                {
+                    <div class="row">
+                        <input type="button" id="RemoveSelectedPolygon" value="Eliminar" onclick="RemoveSelectedPolygon(this)" style="display:none" />
+                        <div>
+                            <button type="button" class="btn btn-sm btn-primary" id="createShapeButton" onclick="OnClickButton(BUTTONMODE.Create)" style="display:none">
+                                <i class="fa fa-map-marker" aria-hidden="true"></i>&nbsp; Crear
+                            </button>
+                            <button type="button" class="btn btn-sm btn-primary" id="editShapeButton" onclick="OnClickButton(BUTTONMODE.Edit)" style="display:none">
+                                <i class="fa fa-pencil" aria-hidden="true"></i>&nbsp; Editar
+                            </button>
+                            <button type="button" class="btn btn-sm btn-danger" id="removeShapeButton" onclick="OnClickButton(BUTTONMODE.Remove)" style="display:none">
+                                <i class="fa fa-trash" aria-hidden="true"></i>&nbsp; Eliminar
+                            </button>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="row" style="display:none">
+                        <input type="button" id="RemoveSelectedPolygon" value="Eliminar" onclick="RemoveSelectedPolygon(this)" style="display:none" />
+                        <div>
+                            <button type="button" class="btn btn-sm btn-primary" id="createShapeButton" onclick="OnClickButton(BUTTONMODE.Create)" style="display:none">
+                                <i class="fa fa-map-marker" aria-hidden="true"></i>&nbsp; Crear
+                            </button>
+                            <button type="button" class="btn btn-sm btn-primary" id="editShapeButton" onclick="OnClickButton(BUTTONMODE.Edit)" style="display:none">
+                                <i class="fa fa-pencil" aria-hidden="true"></i>&nbsp; Editar
+                            </button>
+                            <button type="button" class="btn btn-sm btn-danger" id="removeShapeButton" onclick="OnClickButton(BUTTONMODE.Remove)" style="display:none">
+                                <i class="fa fa-trash" aria-hidden="true"></i>&nbsp; Eliminar
+                            </button>
+                        </div>
+                    </div>
+                }
+                <div id="map" style="position: relative; overflow: hidden; transform: translateZ(0px); background-color: rgb(229, 227, 223);"></div>
+                <input id="pac-input" type="text"
+                       placeholder="Enter a location">
+            </div>
+            <div class="panel-footer text-right">
+                @if (Session.GetViewPermissions().Intersect(new String[] { ConstantHelper.Views.GeoLocation.Map.UPDATE }).Count() > 0)
+                {
+                    <button class="btn btn-primary" id="btnSave" data-url='@Url.Action("Index", "Map", new { Area = "GeoLocation" })'><i class="fa fa-save" aria-hidden="true"></i>&nbsp; Guardar</button>
+                }
+                @if (Session.GetViewPermissions().Intersect(new String[] { ConstantHelper.Views.GeoLocation.Map.VIEW }).Count() > 0)
+                {
+                    <button class="btn btn-primary" id="btnSaveAsReport" data-url='@Url.Action("SaveReport", "Map", new { Area = "GeoLocation" })' data-message="¿En qué formato desea guardar el reporte?" style="display:none"><i class="fa fa-save" aria-hidden="true"></i>&nbsp; Guardar como reporte</button>
+                }
+            </div>
+        </div>
+    </div>
+
+
+}
+@section Scripts
+                {
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0hFla3KhpSUtpkjK7gqJVqfqUCI-7oFs&sensor=false&libraries=drawing,places"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="~/Scripts/bootstrap-treeview.js"></script>
+    <script src="~/Scripts/underscore.js"></script>
+    <script src="http://arthur-e.github.io/Wicket/wicket.js"></script>
+    <script src="http://arthur-e.github.io/Wicket/wicket-gmap3.js"></script>
+    <script src="http://bl.ocks.org/christophermanning/raw/4450188/javascript.util.min.js"></script>
+    <script src="http://bl.ocks.org/christophermanning/raw/4450188/jsts.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/maplabel/maplabel.js"></script>
+    <script type="text/javascript" src="~/Scripts/markerwithlabel/markerwithlabel.js"></script>
+    <script src="~/Areas/GeoLocation/Scripts/Map/Index.js"></script>
+
+    <script>
+        var polygonArray = [];
+        var editedPolygonArray = [];
+        var currentSelectedItem = null
+        var currentSelectedShape = null;
+        var infoWindow = new google.maps.InfoWindow;
+        var visibleMarkers = null;
+
+        var map;
+        var drawingManager;
+        var jsonList;
+        //google.maps.event.addDomListener(window, "load", initialize);
+        $(document).ready(function () {
+            jsonList = @Html.Raw(Json.Encode(Model.ShapeList));
+            CreateTreeNodes(jsonList);
+            InitializeMap();
+            CreateShapes(jsonList);
+        });
+
+        function UpdateJsonList(jsonList) {
+            var shapeInMap;
+            jsonList.forEach(function (element) {
+                shapeInMap  = _.findWhere(editedPolygonArray, { Id: element.Id, ShapeType: element.ShapeType});
+                if (shapeInMap) {
+                    switch (element.ShapeType) {
+                        case SHAPETYPE.Zone:
+                        case SHAPETYPE.Route:
+                            if (shapeInMap.getPath())
+                                element.GeoOptions = { paths: shapeInMap.getPath().getArray(), coords: null }
+                            else
+                                element.GeoOptions = { paths: null, coords: null }
+                            break;
+                        case SHAPETYPE.Address:
+                            element.GeoOptions = { paths: null, coords: shapeInMap.getPosition() }
+                            break;
+                        default:
+                            throw "Error";
+                    }
+                }
+                else
+                    element.GeoOptions = { paths: null, coords: null };
+                if (element.nodes) {
+                    UpdateJsonList(element.nodes);
+                }
+            });
+        }
+
+        $('#mapForm').submit(function () {
+            UpdateJsonList(jsonList);
+            var dataToSend = JSON.stringify(jsonList);
+            $("#PostedShapeList").val(dataToSend);
+            $("#VisibleMarkers").val(JSON.stringify(visibleMarkers));
+            return true;
+        });
+
+        function CreateTreeNodes(jsonList) {
+            var $searchableTree = $('#tree').treeview({
+                data: jsonList
+            });
+
+            $('#tree').on('nodeSelected', function (event, data) { onNodeClick(data); });
+            $('#tree').on('nodeUnselected', function (event, data) { onNodeUnClick();});
+
+            $('#tree').treeview('collapseAll', { silent: true });
+
+            //Search
+            var search = function (e) {
+                var pattern = $('#input-search').val();
+                var options = {
+                    ignoreCase: true,
+                    exactMatch: false,
+                    revealResults: true,
+                };
+                var results = $searchableTree.treeview('search', [pattern, options]);
+                var output = '<p>' + results.length + ' matches found</p>';
+                $.each(results, function (index, result) {
+                    output += '<p>- ' + result.text + '</p>';
+                });
+                $('#search-output').html(output);
+            }
+            //Eventos buscar
+            $('#btn-search').on('click', search);
+            $('#input-search').on('keyup', search);
+            $('#btn-clear-search').on('click', function (e) {
+                $searchableTree.treeview('clearSearch');
+                $('#input-search').val('');
+                $('#search-output').html('');
+            });
+        }
+
+        function InitializeMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: new google.maps.LatLng(-12.0912651, -77.00467609999998),
+                zoom: 16,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            });
+            //Drawing manager
+            drawingManager = new google.maps.drawing.DrawingManager(drawingManagerPolygonOptions);
+
+            google.maps.event.addListener(drawingManager, 'polygoncomplete', function (polygon) {
+                OnFinishDrawing(polygon);
+            });
+            google.maps.event.addListener(drawingManager, 'markercomplete', function (marker) {
+                OnFinishDrawing(marker);
+            });
+            google.maps.event.addListener(drawingManager, 'overlaycomplete', function (e) {
+                var newShape = e.overlay;
+                newShape.type = e.type;
+                //setSelection(newShape);
+                OnFinishDrawing(newShape);
+                //AddAditionalPropertiesToPolygon(newShape);
+                //AddEventHandlersForShape(newShape);
+                // Switch back to non-drawing mode after drawing a shape.
+                drawingManager.setDrawingMode(null);
+            });
+            //google.maps.event.addListener(drawingManager, 'drawingmode_changed', clearSelection);
+            //google.maps.event.addListener(map, 'click', clearSelection);
+
+            //SearchBox
+            var searchBox = new google.maps.places.SearchBox(document.getElementById('pac-input'));
+            map.controls[google.maps.ControlPosition.TOP_CENTER].push(document.getElementById('pac-input'));
+
+            google.maps.event.addListener(searchBox, 'places_changed', function () {
+                searchBox.set('map', null);
+                var places = searchBox.getPlaces();
+                var bounds = new google.maps.LatLngBounds();
+                var i, place;
+                for (i = 0; place = places[i]; i++) {
+                    (function (place) {
+                        var marker = new google.maps.Marker({ position: place.geometry.location });
+                        marker.bindTo('map', searchBox, 'map');
+                        google.maps.event.addListener(marker, 'map_changed', function () {
+                            if (!this.getMap()) {
+                                this.unbindAll();
+                            }
+                        });
+                        bounds.extend(place.geometry.location);
+                    }(place));
+                };
+                map.fitBounds(bounds);
+                searchBox.set('map', map);
+                map.setZoom(Math.min(map.getZoom(), 12));
+            });
+        }
+
+        function CreateShapes(json) {
+            json.forEach(function (element) {
+                if (element.GeoOptions)
+                    DrawShape(element);
+                if (element.nodes) {
+                    CreateShapes(element.nodes);
+                }
+            });
+            //Create a copy of rendered polygons in editedPolygons
+            editedPolygonArray = polygonArray;
+        }
+
+        //Render shapes from model.
+        function DrawShape(item) {
+            var coords, polygon;
+            switch (item.ShapeType)
+            {
+                case SHAPETYPE.Zone:
+                    coords = item.GeoOptions.paths;
+                    polygon = new google.maps.Polygon({
+                        clickable: true,
+                        draggable: false,
+                        editable: false,
+                        fillColor: "yellow",//TODO:
+                        fillOpacity: 0.1,//TODO:
+                        strokeWeight: 0.9, //TODO:
+                        visible: true,
+                        paths: coords,
+                    });
+
+                    AddAditionalPropertiesToPolygon(item, polygon);
+                    AddEventHandlersForShape(polygon);
+                    AddLabelToPolygon(polygon);
+                    polygon.setMap(map);
+                    polygonArray.push(polygon);
+                    break;
+                case SHAPETYPE.Route:
+                    coords = item.GeoOptions.paths;
+                    polygon = new google.maps.Polygon({
+                        clickable: true,
+                        draggable: false,
+                        editable: false,
+                        fillColor: GetRandomColor(),
+                        fillOpacity: 0.40,//TODO:
+                        strokeWeight: 0.0, //TODO:
+                        visible: true,
+                        paths: coords,
+                        //zindex = 10,
+                    });
+
+                    AddAditionalPropertiesToPolygon(item, polygon);
+                    AddEventHandlersForShape(polygon);
+                    AddLabelToPolygon(polygon);
+                    polygon.setMap(map);
+                    polygonArray.push(polygon);
+                    break;
+                case SHAPETYPE.Address:
+                    var icon = {
+                        //url: "https://png.icons8.com/metro/1600/marker.png",
+                        //url: "https://openclipart.org/image/2400px/svg_to_png/262009/Map-Pin.png",
+                        url: "http://maps.google.com/mapfiles/kml/paddle/red-circle.png",
+                        scaledSize: new google.maps.Size(40, 40), // scaled size
+                        origin: new google.maps.Point(0, 0), // origin
+                        anchor: new google.maps.Point(0, 0) // anchor
+                    };
+
+                    var marker = new google.maps.Marker({
+                        position: item.GeoOptions.coords,
+                        map: map,
+                        title: item.text,
+                        labelOrigin: new google.maps.Point(0, 0),
+                        icon:icon,
+                        animation: google.maps.Animation.DROP,
+                        /*label: {
+                            text: item.text,
+                            color: 'black',
+                            fontWeight: "",
+                            fontSize: "13px"
+                        }*/
+                    });
+                    marker.setAnimation(google.maps.Animation.BOUNCE);
+                    AddAditionalPropertiesToPolygon(item, marker);
+                    AddEventHandlersForShape(marker);
+                    polygonArray.push(marker);
+                    break;
+                default:
+                    throw "Invalid shapeType";
+            }
+        }
+
+        function GetShapeFromMap(shapeId, shapeType) {
+            var shape = _.findWhere(editedPolygonArray, { Id: shapeId, ShapeType: shapeType });
+            return shape;
+        }
+
+        function AddAditionalPropertiesToPolygon(item, shape) {
+            shape.Id = item.Id;
+            shape.Name = item.text;
+            shape.ShapeType = item.ShapeType;
+            if (shape.ShapeType === SHAPETYPE.Route|| shape.ShapeType === SHAPETYPE.Address)
+                shape.ParentId = item.ParentId;
+        }
+
+        var isRevertMode = false;
+        function AddEventHandlersForShape(shape) {
+            google.maps.event.addListener(shape, 'click', function () {
+                ShowShapeInfo(shape);
+            });
+            if (shape.ShapeType !== SHAPETYPE.Address) {
+                shape.getPaths().forEach(function (path, index) {
+                    google.maps.event.addListener(path, 'insert_at', function (index) {
+                        if (!IsAValidShape(currentSelectedShape))
+                            currentSelectedShape.getPath().removeAt(index);
+                });
+                google.maps.event.addListener(path, 'remove_at', function (index) {
+                });
+                google.maps.event.addListener(path, 'set_at', function (index, oldLatLng) {
+                    if (!isRevertMode)
+                        if (IsAValidShape(currentSelectedShape))
+                            isRevertMode = false;
+                        else {
+                            isRevertMode = true;
+                            currentSelectedShape.getPath().setAt(index, oldLatLng);
+                        }
+                    else
+                        isRevertMode = false;
+                    });
+
+                google.maps.event.addListener(shape, "mouseover", function () {
+                    shape.LastColor = shape.get("fillColor");
+                this.setOptions({ fillColor: mouseOverColor });
+                })
+
+                google.maps.event.addListener(shape, "mouseout", function () {
+                    this.setOptions({ fillColor: shape.LastColor });
+                });
+
+
+
+            });
+            google.maps.event.addListener(shape, 'dragend', function (index) {
+                });
+            }
+
+        }
+
+        function OnClickButton(_buttonMode) {
+            var shapeType = currentSelectedItem.ShapeType;
+            var shape = GetShapeFromMap(currentSelectedItem.Id, currentSelectedItem.ShapeType);
+            var drawingMode;
+            switch (_buttonMode) {
+                case BUTTONMODE.Create:
+                    if (shape)
+                        throw "No se puede crear, ya existe en el mapa";
+                    switch (shapeType) {
+                        case SHAPETYPE.Zone:
+                            drawingManager.setOptions({
+                                drawingMode: google.maps.drawing.OverlayType.POLYGON,
+                                polygonOptions: polygonOptionsZone
+                            });
+                            break;
+                        case SHAPETYPE.Route:
+                            drawingManager.setOptions({
+                                drawingMode: google.maps.drawing.OverlayType.POLYGON,
+                                polygonOptions: polygonOptionsRoute
+                            });
+                            break;
+                        case SHAPETYPE.Address:
+                            drawingManager.setOptions({
+                                drawingMode: google.maps.drawing.OverlayType.MARKER,
+                            });
+                            break;
+                        default:
+                            throw "No se reconoce el tipo de forma";
+                    }
+                    drawingManager.setMap(map);
+                    break;
+                case BUTTONMODE.Edit:
+                    if (!shape)
+                        throw "No se puede editar, la forma no existe en el mapa.";
+                    setSelection(shape);
+                    break;
+                case BUTTONMODE.Remove:
+                    setSelection(shape);
+                    RemoveSelectedPolygon();
+                    EvaluateSelectedItem();
+                    break;
+                default:
+                    throw "Error button mode";
+                    break;
+            }
+        }
+
+        function onNodeClick(data) {
+            clearSelection();
+            currentSelectedItem = data;
+            EvaluateSelectedItem();
+        }
+
+        function onNodeUnClick(data) {
+            clearSelection();
+            currentSelectedItem = null;
+            EvaluateSelectedItem();
+        }
+
+        function EvaluateSelectedItem() {
+            if (currentSelectedItem) {
+
+                var prefixTitle;
+                var shapeType = currentSelectedItem.ShapeType;
+                switch (currentSelectedItem.ShapeType) {
+                    case SHAPETYPE.Zone:
+                        prefixTitle = " zona";
+                        break;
+                    case SHAPETYPE.Route:
+                        prefixTitle = " ruta";
+                        break;
+                    case SHAPETYPE.Address:
+                        prefixTitle = " cliente";
+                        break;
+                    default:
+                        throw "Invalid shape";
+                }
+
+                $("#editShapeButton").html("Editar " + prefixTitle);
+                $("#removeShapeButton").html("Eliminar " + prefixTitle);
+                $("#createShapeButton").html("Crear" + prefixTitle);
+
+                var shape = GetShapeFromMap(currentSelectedItem.Id, currentSelectedItem.ShapeType);
+                if (shape) {
+                    currentSelectedShape = shape;
+                    //---------Activa efecto zoom en el mapa---------
+                    switch (currentSelectedItem.ShapeType) {
+                        case SHAPETYPE.Zone:
+                        case SHAPETYPE.Route:
+                            map.fitBounds(shape.getBounds());
+                            break;
+                        case SHAPETYPE.Address:
+                            map.panTo(shape.getPosition());
+                            break;
+                        default:
+                            throw "Invalid shape";
+                    }
+
+                    $("#editShapeButton").slideDown();
+                    $("#removeShapeButton").slideDown();
+                    $("#createShapeButton").slideUp();
+                }
+                else {
+                    currentSelectedShape = null;
+                    $("#createShapeButton").slideDown();
+                    $("#editShapeButton").slideUp();
+                    $("#removeShapeButton").slideUp();
+                }
+
+            }
+            else {
+                currentSelectedShape = null;
+                $("#createShapeButton").slideUp();
+                $("#editShapeButton").slideUp();
+                $("#removeShapeButton").slideUp();
+            }
+
+        }
+
+        function OnFinishDrawing(shape) {
+            currentSelectedShape = shape;
+            AddAditionalPropertiesToPolygon(currentSelectedItem, shape);
+            AddEventHandlersForShape(shape);
+
+            var isAValidShape = IsAValidShape(shape);
+            if (isAValidShape) {
+                editedPolygonArray.push(shape);
+            }
+            else {
+                RemoveSelectedPolygon();
+                shape.setMap(null);
+            }
+            EvaluateSelectedItem();
+        }
+
+        function ShowShapeInfo(shape) {
+            var responseData;
+            $.ajax({
+                cache: false,
+                url: '@Url.Action("GetShapeInfo", "Map", new { Area = ConstantHelper.Area.GEOLOCATION})',
+                type: 'POST',
+                data: { 'id': shape.Id, 'shapeType': shape.ShapeType },
+                success: function (data) {
+                    var content;
+                    var position;
+                    switch (shape.ShapeType) {
+                        case SHAPETYPE.Zone:
+                            position = GetPolygonCenter(shape);
+                            content = "ZONA " + data.Name + "<br>";
+                            content += data.Id;
+                            break;
+                        case SHAPETYPE.Route:
+                            position = GetPolygonCenter(shape);
+                            content = "RUTA " + data.Name + "<br>";
+                            content += data.Id;
+                            break;
+                        case SHAPETYPE.Address:
+                            position = shape.getPosition();
+                            content = data.RazonSocial + "<br>" +
+                                data.Ruc + "<br>" +
+                                data.Address + "<br>" +
+                                "Distrito: " + data.Distrito + "<br>" +
+                                "Provincia: " + data.Provincia + "<br>" +
+                                "Departamento: " + data.Departamento + "<br>"
+                                "Canal: " + data.Canal + "<br>"
+                                "Activos fijos: " + data.ActivosFijos + "<br>";
+                            break;
+                        default:
+                    }
+                    infoWindow.setContent(content);
+                    infoWindow.setPosition(position);
+                    infoWindow.open(map);
+                },
+                error: function (err, exception ) {
+                    ShowMessage(err.statusText, err.responseJSON);
+                }
+            })
+        }
+
+        function SearchClient() {
+            var model = {
+                Region: $("#Region").val(),
+                Departamento: $("#Departamento").val(),
+                Provincia: $("#Provincia").val(),
+                Distrito: $("#Distrito").val(),
+                Zona: $("#Zona").val(),
+                Ruta: $("#Ruta").val(),
+                Canal: $("#Canal").val(),
+                Giro: $("#Giro").val(),
+                ConActivos: $("#ConActivos").is(":checked"),
+                CodigoActivo: $("#CodigoActivo").val(),
+                TipoCliente: $("#TipoCliente").val(),
+                Vendedor: $("#Vendedor").val(),
+                Supervisor: $("#Supervisor").val(),
+                JefeVentas: $("#JefeVentas").val(),
+                DiaDeVisitaLunes: $("#DiaDeVisitaLunes").is(":checked"),
+                DiaDeVisitaMartes: $("#DiaDeVisitaMartes").is(":checked"),
+                DiaDeVisitaMiercoles: $("#DiaDeVisitaMiercoles").is(":checked"),
+                DiaDeVisitaJueves: $("#DiaDeVisitaJueves").is(":checked"),
+                DiaDeVisitaViernes: $("#DiaDeVisitaViernes").is(":checked"),
+                DiaDeVisitaSabado: $("#DiaDeVisitaSabado").is(":checked"),
+                DiaDeVisitaDomingo: $("#DiaDeVisitaDomingo").is(":checked"),
+                FrecuenciaVisita: $("#FrecuenciaVisita").val(),
+                VentasMontoMinimo: $("#VentasMontoMinimo").val(),
+                VentasMontoMaximo: $("#VentasMontoMaximo").val(),
+                VentasFechaInicio: $("#VentasFechaInicio").val(),
+                VentasFechaFin: $("#VentasFechaFin").val()
+                //Codigo: $("#Codigo").val(),
+                //RazonSocial: $("#RazonSocial").val(),
+            };
+            $('#main-loader').fadeIn(),
+            $.ajax({
+                cache: false,
+                url: '@Url.Action("SearchClient", "Map", new { Area = ConstantHelper.Area.GEOLOCATION})',
+                type: 'POST',
+                data: { 'model': model },
+                success: function (data) {
+                    SetMarkersAsVisible(data);
+                    $('#main-loader').fadeOut();
+                },
+                error: function (err, exception) {
+                    ShowMessage(err.statusText, err.responseJSON);
+                    $('#main-loader').fadeOut();
+                }
+                });
+        }
+
+        function OnChangeSelect2(selectInput) {
+            var $this = $(selectInput);
+            var value = $this.val();
+            var url = $this.data('url');
+            var target = $('#' + $this.data('target'));
+            target.select2("val", "");
+            //$('#main-loader').fadeIn(),
+            $.ajax({
+                cache: false,
+                method: 'post',
+                url: url,
+                type: 'json',
+                data: { 'CadenaBuscar': value },
+                success: function (dataX) {
+                    target.html('').select2({ data: [{ id: '', text: '' }] });
+                    target.select2({
+                        data: '',
+                        data: dataX,
+                        language: 'es',
+                        placeholder: "[ -- Seleccione -- ]",
+                        allowClear: true
+                    });
+                    //$('#main-loader').fadeOut();
+                }
+            })
+        }
+
+        function SetMarkersAsVisible(clientCodesArray) {
+            visibleMarkers = [];
+            SetVisibilityOfMarkers(false);
+            clientCodesArray.forEach(function (element) {
+                shapeInMap = _.findWhere(editedPolygonArray, { Id: element, ShapeType : SHAPETYPE.Address});
+                if (shapeInMap) {
+                    visibleMarkers.push(element);
+                    shapeInMap.setVisible(true);
+                }
+            });
+        }
+
+        function SetVisibilityOfMarkers(value) {
+            editedPolygonArray.forEach(function (element) {
+                if(element.ShapeType == SHAPETYPE.Address)
+                    element.setVisible(value);
+            })
+        }
+
+        function AddLabelToPolygon(polygonShape) {
+            //OPTION1
+           /*
+            var marker = new MarkerWithLabel({
+                position: GetPolygonCenter(polygonShape),
+                map: map,
+                labelAnchor: new google.maps.Point(3, 30),
+                //labelClass: Sclass, // the CSS class for the label
+                labelInBackground: true,
+                labelContent: polygonShape.Name,
+            });*/
+
+            //OPTION2
+            switch (polygonShape.ShapeType) {
+                case SHAPETYPE.Zone:
+                    var mapLabel2 = new MapLabel({
+                        text: polygonShape.Name,
+                        minZoom: 1,
+                        position: GetPolygonCenter(polygonShape),
+                        map: map,
+                        fontSize: 12,
+                        strokeWeight:10,
+                        align: 'center',
+                        zIndex: 1000,
+                    });
+                    break;
+                case SHAPETYPE.Route:
+                    var mapLabel2 = new MapLabel({
+                        minZoom: 1,
+                        text: polygonShape.Name,
+                        position: GetPolygonCenter(polygonShape),
+                        map: map,
+                        fontSize: 12,
+                        align: 'center',
+                        zIndex: 1000,
+                    });
+                    break;
+                default:
+            }
+           
+            //mapLabel2.set('position', GetPolygonCenter(polygonShape));
+            
+            //OPTION3
+            /*
+            var marker = new google.maps.Marker({
+                position: GetPolygonCenter(polygonShape),
+                map: map,
+                title: 'asdfasfasf',
+                icon: {
+                    labelOrigin: new google.maps.Point(0, 0),
+                    url: "https://upload.wikimedia.org/wikipedia/commons/d/d2/Blank.png"
+                },
+                label: {
+                    text: polygonShape.Name,
+                    color: 'black',
+                    fontWeight: "",//bold
+                    fontSize: "12px"
+                }
+            });*/
+        }
+
+        function GetWiCketFromPolygon(polygon) {
+            var wicket = new Wkt.Wkt();
+            wicket.fromObject(polygon);
+            var wkt1 = wicket.write();
+            return wkt1;
+        }
+
+        function UseJstsToTestForIntersection(wicket1, wicket2) {
+            // Instantiate JSTS WKTReader and get two JSTS geometry objects
+            var wktReader = new jsts.io.WKTReader();
+            var geom1 = wktReader.read(wicket1);
+            var geom2 = wktReader.read(wicket2);
+
+            if (geom2.intersects(geom1)) {
+                alert('intersection confirmed!');
+            } else {
+                alert('..no intersection.');
+            }
+        }
+
+        function IsPolygonOverlaping(polygon1, polygon2) {
+            var wicket1 = GetWiCketFromPolygon(polygon1);
+            var wicket2 = GetWiCketFromPolygon(polygon2);
+
+            // Instantiate JSTS WKTReader and get two JSTS geometry objects
+            var wktReader = new jsts.io.WKTReader();
+            var geom1 = wktReader.read(wicket1);
+            var geom2 = wktReader.read(wicket2);
+
+            if (geom2.intersects(geom1)) {//TODO: REFACTORIZE :p
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        function OnTabClick(tabNumber) {
+            switch (tabNumber) {
+                case 1:
+                    SetVisibilityOfMarkers(true);
+                    $("#btnSave").slideDown();
+                    $("#btnSaveAsReport").slideUp();
+                    break;
+                case 2:
+                    SearchClient();
+                    $("#btnSave").slideUp();
+                    $("#btnSaveAsReport").slideDown();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        function SaveAsReport() {
+            var url = '@Url.Action("SaveReport", "Map", new { Area = ConstantHelper.Area.GEOLOCATION})';
+             $.ajax({
+                //cache: false,
+                type: 'GET',
+                 url: url,
+                 contentType: 'application/json; charset=utf-8',
+                 dataType : 'json',
+                 data: { "model": null },
+                 success: function (data) {
+                   windows.location='@Url.Action("SaveReport", "Map", new { Area = ConstantHelper.Area.GEOLOCATION})';
+                  },
+                 error: function (err, exception) {
+                    ShowMessage(err.statusText, err.responseJSON);
+                 }
+                });
+        }
+
+        $("#btnSave").click(function (e) {
+            e.preventDefault();
+            var form = $("#mapForm");
+            form.prop("action", $(this).data("url"));
+            form.submit();
+        });
+
+        $("#btnSaveAsReport").click(function (e) {
+            SearchClient();
+            var $this = $(this);
+            var message = $this.data('message');
+            e.preventDefault();
+            var form = $("#mapForm");
+            var url = $(this).data("url");
+            alertify.okBtn("Excel").cancelBtn("Pdf").confirm(message, function () {
+                //se clickeo ok
+                form.prop("action",url);
+                $("#ReportType").val(1);//TODO:
+                form.submit();
+            }, function () {
+                //se clickeo cancelar
+                form.prop("action", url);
+                $("#ReportType").val(2);//TODO:
+                form.submit();
+            });
+
+            $('.cancel').addClass('btn');
+            $('.cancel').addClass('btn-primary');
+
+            $('.ok').addClass('btn');
+            $('.ok').addClass('btn-primary');
+
+        })
+
+    </script>
+    <style>
+        .form-control {
+            height: 24px;
+        }
+
+        #map {
+            margin: 20px 0;
+            padding: 0;
+            height: 500px;
+            float: left;
+            width: 100%;
+        }
+
+        .select2-container--default .select2-selection--single {
+            height: 25px;
+            padding: 0px 20px 0px 10px;
+        }
+
+        .form-control {
+            height: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 4px;
+        }
+
+        .input-group-addon {
+            padding: 4px 4px;
+        }
+
+        input, select, textarea {
+            font-size: 80%;
+        }
+
+        .list-group-item {
+            padding: 6px;
+        }
+
+
+        .fixed-panel {
+            min-height: 400px;
+            max-height: 400px;
+            overflow-y: scroll;
+            overflow-x: hidden;
+        }
+    </style>
+}

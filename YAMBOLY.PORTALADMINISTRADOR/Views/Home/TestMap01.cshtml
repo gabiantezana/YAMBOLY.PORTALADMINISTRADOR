@@ -1,0 +1,151 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+<div>
+    <div id="map" style="width: 500px; height: 400px;"></div>
+</div>
+
+@section Scripts{
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0hFla3KhpSUtpkjK7gqJVqfqUCI-7oFs"></script>
+    @*<script type="text/javascript" src="~/Scripts/markerwithlabel/markerwithlabel.js"></script>*@
+    <script type="text/javascript" src="~/Scripts/maplabel/maplabel.js"></script>
+
+    <script>
+        var infoWindow;
+        var map;
+        initMap();
+        function initMap() {
+            infoWindow = new google.maps.InfoWindow;
+            var mapOptions = {
+                zoom: 4,
+                //center: new google.maps.LatLng(-12.310371724882625, -78.90064948221504),
+                center: new google.maps.LatLng(40, 9),
+                //mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+
+            map = new google.maps.Map(document.getElementById("map"), mapOptions);
+
+            var myPaths = [
+                new google.maps.LatLng(39, 4),
+                new google.maps.LatLng(34, 24),
+                new google.maps.LatLng(43, 24),
+                new google.maps.LatLng(39, 4)];
+
+            var polygon = new google.maps.Polygon({
+                editable: true,
+                strokeColor: "#000000",
+                strokeOpacity: 0,
+                strokeWeight: 0,
+                fillColor: "#FF0000",
+                fillOpacity: 0.35,
+                content: "Lima",
+                paths: [
+                    new google.maps.LatLng(39, 4),
+                    new google.maps.LatLng(34, 24),
+                    new google.maps.LatLng(43, 24),
+                    new google.maps.LatLng(39, 4)],
+                map: map
+            });
+            polygon.addListener('click', showArrays);
+
+            //Define position of label
+            var bounds = new google.maps.LatLngBounds();
+            for (var i = 0; i < myPaths.length; i++) {
+                bounds.extend(myPaths[i]);
+            }
+
+            var marker = new google.maps.Marker({
+                position: bounds.getCenter(),
+                map: map,
+                title: 'asdfasfasf',
+                icon: {
+                    labelOrigin: new google.maps.Point(0, 0),
+                    url: "https://upload.wikimedia.org/wikipedia/commons/d/d2/Blank.png"
+                },
+                label: {
+                    text:'ZONA 001- LIMA',
+                    color: 'black',
+                    fontWeight: "bold",
+                    fontSize: "16px"
+                }
+            });
+
+
+
+            //Define position of label
+            /*var bounds = new google.maps.LatLngBounds();
+            for (var i = 0; i < myPaths.length; i++) {
+                bounds.extend(myPaths[i]);
+            }
+
+            var myLatlng = bounds.getCenter();
+
+            var mapLabel2 = new MapLabel({
+                text: 'asdfdasdfasdf',
+                position: myLatlng,
+                map: map,
+                fontSize: 20,
+                align: 'left',
+                zIndex: -100,
+            });
+
+            mapLabel2.set('position', myLatlng);
+            var obj = {};
+            obj.poly = polygon;
+            obj.label = mapLabel2;*/
+
+            /*
+            var marker = new MarkerWithLabel({
+                position: new google.maps.LatLng(39, 4),
+                map: map,
+                labelAnchor: new google.maps.Point(3, 30),
+                //labelClass: Sclass, // the CSS class for the label
+                labelInBackground: true,
+                title: "Polygon 1"
+            });*/
+
+
+            /*var polygon2 = new google.maps.Polygon({
+                editable: true,
+                strokeOpacity: 15,
+                strokeWeight: 0,
+                fillColor: '#ff9999',
+                fillOpacity: 6,
+                content: "Ruta 1",
+                paths: [
+                    new google.maps.LatLng(39, 4),
+                    new google.maps.LatLng(43, 24),
+                    new google.maps.LatLng(43, 24)],
+                map: map
+            });
+            polygon2.addListener('click', showArrays);*/
+
+
+
+        }
+        // Get paths from polygon and set event listeners for each path separately
+        function showArrays(event) {
+            // Since this polygon has only one path, we can call getPath() to return the
+            // MVCArray of LatLngs.
+            var vertices = this.getPath();
+
+            var contentString = '<b>' + this.content + '</b><br>' +
+                'Clicked location: <br>' + event.latLng.lat() + ',' + event.latLng.lng() +
+                '<br>';
+
+            // Iterate over the vertices.
+            for (var i = 0; i < vertices.getLength(); i++) {
+                var xy = vertices.getAt(i);
+                contentString += '<br>' + 'Coordinate ' + i + ':<br>' + xy.lat() + ',' +
+                    xy.lng();
+            }
+
+            // Replace the info window's content and position.
+            infoWindow.setContent(contentString);
+            infoWindow.setPosition(event.latLng);
+
+            //infoWindow.open(map);
+        }
+
+    </script>
+}

@@ -1,0 +1,95 @@
+﻿@model YAMBOLY.PORTALADMINISTRADOR.VIEWMODEL.Administration.User.UserListViewModel
+
+@{
+    ViewBag.Title = "Mantenimiento de usuarios";
+    ViewBag.Icon = "list";
+}
+
+<div class="panel">
+    <div class="panel-body">
+
+        <div class="panel-footer text-right">
+            <a class="btn btn-primary animsition-link" id="btn-crear" href="@(Url.Action("AddUpdate", "User"))">
+                <i class="fa fa-plus"></i>
+                Nuevo
+            </a>
+        </div>
+        <br />
+        <div class="table-responsive">
+            @using (Html.BeginForm("List", "User", FormMethod.Post, new { Area = "Administration" }))
+            {
+                <div class="form-group col-md-6">
+                    <div class="col-sm-11" style="padding-right:0px">
+                        @Html.DropDownListFor(x => Model.SearchString, new SelectList(Model.DefaultList, "UserId", "UserName"), new { @class = "form-control form-group-margin select2-search" })
+                    </div>
+                    <div class="col-sm-1" style="padding:0px">
+                        <button type="button" class="btn btn-icon btn-primary"><i class="icon wb-search" aria-hidden="true"></i></button>
+                    </div>
+                </div>
+            }
+            <div id="list" style="padding: 30px;">
+                @Html.Partial("PartialView/_ListPartialView", Model.List)
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+
+        $(function () {
+            $('.select2-search').select2({
+                ajax: {
+                    url: '@Url.Action("GetJList", "User", new { Area = "Administration"})',
+                    dataType: 'json',
+                    type: 'POST',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            searchString: params.term
+                        };
+                    },
+                    processResults: function (data, params) {
+                        return {
+                            results: data
+                        };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 3,
+                allowClear: true,
+                language: 'es',
+                placeholder: 'Usuario'
+            });
+        });
+
+
+        $('.select2-search').change(function () {
+            $this = $(this);
+            var value = $this.val() == null ? $this.val() : 0;
+            $table = $('#list');
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("_ListPartialView", "User", new { Area = "Administration"})',
+                cache: false,
+                data: { 'id': $this.val() },
+                beforeSend: function () {
+                    $('#main-loader').fadeIn();
+                },
+                success: function (data) {
+                    $table.empty();
+                    $table.append(data);
+                    $('#main-loader').fadeOut();
+                }
+
+            })
+
+        });
+
+        function complete() {
+            console.log('complete');
+        }
+
+    </script>
+}
